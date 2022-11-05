@@ -1,0 +1,12 @@
+{
+  "name": "wallet",
+  "version": "1.0.0",
+  "description": "a basic wallet, user can fund, withdraw and transfer to other users with a wallet",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
