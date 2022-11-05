@@ -1,27 +1,43 @@
 import express, { Request, Response, Express, Router } from "express";
 import dotenv from "dotenv";
 import { trxRouter } from "./services/transactions/transactions.routes";
+import { knex } from "./configs/knex";
+import chalk from "chalk";
 
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT;
-const rootUrl = process.env.ROOT_URL;
+const port = process.env.PORT || 3100;
+const rootUrl = process.env.ROOT_URL || "http://localhost";
+const logger = console; // graylog perhaps?
 
 // healthcheck
 app.get(`${rootUrl}/healthcheck`, (req: Request, res: Response) => {
   res.send("wallet is up and running");
 });
 
+knex
+  .raw("SELECT VERSION()")
+  .then((version: any) => {
+    logger.log(
+      chalk.green(
+        `[Database]: Connection was succesful. Version: ${version[0][0]["VERSION()"]}`
+      )
+    );
+  })
+  .catch((err: any) => {
+    console.log(chalk.red(err));
+    throw err;
+  });
+
 // route configs
 app.use(`${rootUrl}/transactions`, trxRouter);
 
-// database setup
-// pool connections etc.
-
 // app is up
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  logger.log(
+    chalk.green(`[Server]⚡️: Server is running at http://localhost:${port}`)
+  );
 });
 
 // create account
