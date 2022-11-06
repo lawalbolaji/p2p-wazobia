@@ -53,7 +53,7 @@ export async function loginUser(userDetails: UserDetailsDto): Promise<string | f
       if (isCorrectPassword) {
         logger.log(chalk.green(`[Server]: Auth Request, account created for user with uuid: ${users[0].uuid}`));
 
-        return jwt.sign({ uuid: users[0].uuid }, process.env.JWT_SECRET || "");
+        return jwt.sign({ uuid: users[0].uuid }, process.env.JWT_SECRET || "", { expiresIn: process.env.TTL || "10h" });
       }
     }
 
