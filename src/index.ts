@@ -1,11 +1,11 @@
 import express, { Request, Response, Express, Router } from "express";
 import dotenv from "dotenv";
-import { trxRouter } from "./services/transactions/transactions.routes";
 import { knex } from "./configs/knex";
 import chalk from "chalk";
 import { expressjwt } from "express-jwt";
 import { authRouter } from "./services/auth/auth.routes";
 import { logger } from "./configs/logger";
+import { walletRouter } from "./services/wallet/wallet.routes";
 
 dotenv.config();
 
@@ -32,7 +32,11 @@ knex
   });
 
 // route configs
-app.use(`${rootUrl}/transactions`, [expressjwt({ secret: process.env.JWT_SECRET!, algorithms: ["RS512"] })], trxRouter);
+app.use(
+  `${rootUrl}/users/:userid/wallet`,
+  [expressjwt({ secret: process.env.JWT_SECRET!, algorithms: ["RS512"] })],
+  walletRouter
+);
 app.use(`${rootUrl}/auth`, authRouter);
 
 // app is up
