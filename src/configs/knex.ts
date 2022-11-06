@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { Knex } from "knex";
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ const connectionOptions = {
   database: process.env.DATABASE_NAME,
 };
 
-export const knex = require("knex")({
+export const knex: Knex = require("knex")({
   client: "mysql2",
   connection: connectionOptions,
 });

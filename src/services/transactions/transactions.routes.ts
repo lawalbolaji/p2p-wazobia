@@ -7,4 +7,10 @@ trxRouter.get("/", (req: Request, res: Response) => {
   res.send("all transactions");
 });
 
+// TODO: fund wallet
+
+// TODO: withdraw from wallet
+
+// TODO: transfer funds to another wallet
+
 export { trxRouter };
