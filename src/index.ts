@@ -5,7 +5,7 @@ import chalk from "chalk";
 import { expressjwt } from "express-jwt";
 import { authRouter } from "./services/auth/auth.routes";
 import { logger } from "./configs/logger";
-import { walletRouter } from "./services/wallet/wallet.routes";
+import { usersRouter } from "./services/users/users.routes";
 
 dotenv.config();
 
@@ -32,12 +32,8 @@ knex
   });
 
 // route configs
-app.use(
-  `${rootUrl}/users/:userid/wallet`,
-  [expressjwt({ secret: process.env.JWT_SECRET!, algorithms: ["RS512"] })],
-  walletRouter
-);
 app.use(`${rootUrl}/auth`, authRouter);
+app.use(`${rootUrl}/users`, [expressjwt({ secret: process.env.JWT_SECRET!, algorithms: ["RS512"] })], usersRouter);
 
 // app is up
 app.listen(port, () => {
