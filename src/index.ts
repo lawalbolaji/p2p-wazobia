@@ -33,7 +33,7 @@ knex
 
 // route configs
 app.use(`${rootUrl}/auth`, authRouter);
-app.use(`${rootUrl}/users`, [expressjwt({ secret: process.env.JWT_SECRET!, algorithms: ["RS512"] })], usersRouter);
+app.use(`${rootUrl}/users`, [expressjwt({ secret: process.env.JWT_SECRET!, algorithms: ["HS256"] })], usersRouter);
 
 // app is up
 app.listen(port, () => {
