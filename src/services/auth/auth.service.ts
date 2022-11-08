@@ -18,7 +18,7 @@ export async function createNewUser(userDetails: UserDetailsDto): Promise<string
   try {
     await knex.transaction(async (trx: Knex) => {
       // check if email already exists
-      const users = await knex<User>("User").select().where({ email: userDetails.Email });
+      const users = await knex<User>("user").select().where({ email: userDetails.Email });
       if (users.length) throw new Error("email already exists");
 
       await trx<User>("User").insert({
@@ -44,14 +44,14 @@ export async function createNewUser(userDetails: UserDetailsDto): Promise<string
 
 export async function loginUser(userDetails: UserDetailsDto): Promise<string | false> {
   try {
-    const users = await knex<User>("User").select().where({ email: userDetails.Email });
+    const users = await knex<User>("user").select().where({ email: userDetails.Email });
 
     // TODO: add unique key index to email column
     if (users.length) {
       const isCorrectPassword = await bcrypt.compare(userDetails.Password, users[0].password);
 
       if (isCorrectPassword) {
-        logger.log(chalk.green(`[Server]: Auth Request, account created for user with uuid: ${users[0].uuid}`));
+        logger.log(chalk.green(`[Server]: Auth Request, user with uuid: ${users[0].uuid} logged in`));
 
         return jwt.sign({ uuid: users[0].uuid }, process.env.JWT_SECRET || "", { expiresIn: process.env.TTL || "10h" });
       }
