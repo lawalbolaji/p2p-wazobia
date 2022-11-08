@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { knex as dbClient } from "../../configs/knex";
 import { logger } from "../../configs/logger";
 import { PayeeBankAccountDetailsType, PayerCardDetailsType, WalletFundDto, WalletTransferDto, WalletWithdrawalDto } from "./dtos/wallet-transfer.dto";
@@ -32,7 +31,7 @@ export async function executeWalletTransfer(walletTransferDto: WalletTransferDto
 
     await trx.commit();
   } catch (error: any) {
-    logger.log(chalk.red(error?.message, error?.stack));
+    logger.error(error?.message, error?.stack);
 
     trx.rollback();
     return { failure: true };
@@ -59,7 +58,7 @@ export async function fundWallet(walletFundDto: WalletFundDto, userUuid: string,
 
     trx.commit();
   } catch (error: any) {
-    logger.log(chalk.red(error?.message, error?.stack));
+    logger.error(error?.message, error?.stack);
 
     trx.rollback();
     return { failure: true };
@@ -86,7 +85,7 @@ export async function withdrawFromWallet(walletWithdrawalDto: WalletWithdrawalDt
 
     trx.commit();
   } catch (error: any) {
-    logger.log(chalk.red(error?.message, error?.stack));
+    logger.error(error?.message, error?.stack);
 
     trx.rollback();
     return { failure: true };

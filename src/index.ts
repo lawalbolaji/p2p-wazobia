@@ -27,7 +27,7 @@ knex
     logger.log(chalk.green(`[Database]: Connection was succesful. Version: ${version[0][0]["VERSION()"]}`));
   })
   .catch((err: any) => {
-    logger.log(chalk.red(err));
+    logger.error(err);
     throw err;
   });
 
