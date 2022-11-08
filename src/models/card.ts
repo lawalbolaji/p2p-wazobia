@@ -1,5 +1,6 @@
 export class Card {
   id: number;
+  uuid: string;
   entity_id: number;
   owner_entity_id: number;
   cardholder_firstName: string;
