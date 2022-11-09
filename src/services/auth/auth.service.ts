@@ -1,4 +1,3 @@
-import { knex } from "../../configs/knex";
 import { Knex } from "knex";
 import { User } from "../../models/user";
 import { UserDetailsDto } from "./dtos/userdetails.dto";
@@ -11,18 +10,18 @@ import chalk from "chalk";
 import { Wallet } from "../../models/wallet";
 import { Entity } from "../../models/entity";
 
-export async function createNewUser(userDetails: UserDetailsDto): Promise<string | false> {
+export async function createNewUser(userDetails: UserDetailsDto, dbClient: Knex<any, any[]>, process: NodeJS.Process): Promise<string | false> {
   const timestamp: string = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-  const saltRounds = 10; // TODO: probably ship to env
+  const saltRounds = +(process.env.SALT_ROUNDS || 10);
   const hashedPassword = await bcrypt.hash(userDetails.Password, saltRounds);
   const user_uuid = uuidv4();
   const wallet_uuid = uuidv4();
 
   try {
-    await knex.transaction(async (trx: Knex) => {
+    await dbClient.transaction(async (trx: Knex) => {
       // check if email already exists
-      const users = await knex<User>("user").select().where({ email: userDetails.Email });
-      if (users.length) throw new Error("email already exists");
+      const [users] = await dbClient<User>("user").select().where({ email: userDetails.Email });
+      if (!!users) throw new Error("email already exists");
 
       await trx<Entity>("entity").insert({
         uuid: user_uuid,
@@ -70,18 +69,18 @@ export async function createNewUser(userDetails: UserDetailsDto): Promise<string
   return jwt.sign({ uuid: user_uuid }, process.env.JWT_SECRET || "", { expiresIn: process.env.TTL || "10h" });
 }
 
-export async function loginUser(userDetails: UserDetailsDto): Promise<string | false> {
+export async function loginUser(userDetails: UserDetailsDto, dbClient: Knex, process: NodeJS.Process): Promise<string | false> {
   try {
-    const users = await knex<User>("user").select().where({ email: userDetails.Email });
+    const [user] = await dbClient<User>("user").select().where({ email: userDetails.Email });
 
     // TODO: add unique key index to email column
-    if (users.length) {
-      const isCorrectPassword = await bcrypt.compare(userDetails.Password, users[0].password);
+    if (!!user) {
+      const isCorrectPassword = await bcrypt.compare(userDetails.Password, user.password);
 
       if (isCorrectPassword) {
-        logger.log(chalk.green(`[Server]: Auth Request, user with uuid: ${users[0].uuid} logged in`));
+        logger.log(chalk.green(`[Server]: Auth Request, user with uuid: ${user.uuid} logged in`));
 
-        return jwt.sign({ uuid: users[0].uuid }, process.env.JWT_SECRET || "", { expiresIn: process.env.TTL || "10h" });
+        return jwt.sign({ uuid: user.uuid }, process.env.JWT_SECRET || "", { expiresIn: process.env.TTL || "10h" });
       }
     }
 
