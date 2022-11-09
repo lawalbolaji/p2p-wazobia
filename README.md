@@ -34,6 +34,10 @@ lendsqr wallet is an open source wallet...
 * [Mysql](https://www.mysql.com/) This is a free open source SQL database with ACID compliance.
 * [Knexjs ORM](https://knexjs.org/) This makes it easy to write mysql queries by providing a straight-forward, schema-based solution to model to application data.
 
+### ERD
+<img width="815" alt="Screenshot 2022-11-09 at 02 52 27" src="https://user-images.githubusercontent.com/22568024/200717581-2c2394a0-f0b7-4f5b-ba55-5b5869371ff6.png">
+
+
 ### Authors
 * [Abdulrasheed Lawal](https://github.com/lawalbolaji)
 
