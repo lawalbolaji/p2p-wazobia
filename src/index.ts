@@ -1,6 +1,6 @@
 import express, { Request, Response, Express, Router } from "express";
 import dotenv from "dotenv";
-import { knex } from "./configs/knex";
+import { dbClient } from "./configs/knex";
 import chalk from "chalk";
 import { expressjwt } from "express-jwt";
 import { authRouter } from "./services/auth/auth.routes";
@@ -21,7 +21,7 @@ app.get(`${rootUrl}/healthcheck`, (req: Request, res: Response) => {
 });
 
 // check database connection
-knex
+dbClient
   .raw("SELECT VERSION()")
   .then((version: any) => {
     logger.log(chalk.green(`[Database]: Connection was succesful. Version: ${version[0][0]["VERSION()"]}`));
