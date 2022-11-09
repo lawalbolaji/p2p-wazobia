@@ -1,4 +1,3 @@
-import { knex as dbClient } from "../../configs/knex";
 import { logger } from "../../configs/logger";
 import { PayeeBankAccountDetailsType, PayerCardDetailsType, WalletFundDto, WalletTransferDto, WalletWithdrawalDto } from "./dtos/wallet-transfer.dto";
 import { fundWalletWithCard, transferFunds, withdrawFromWalletToBank } from "../wallet/wallet.service";
@@ -11,11 +10,11 @@ import { format } from "date-fns";
 import { Card } from "../../models/card";
 import { User } from "../../models/user";
 
-export async function executeWalletTransfer(walletTransferDto: WalletTransferDto, userUuid: string, walletUuid: string) {
+export async function executeWalletTransfer(walletTransferDto: WalletTransferDto, userUuid: string, walletUuid: string, dbClient: Knex) {
   const trx = await dbClient.transaction();
 
   try {
-    const deepUserRecord = await fetchUserRecordDeep(userUuid, walletUuid, trx);
+    const deepUserRecord = await fetchUserRecordDeep({ userUuid, walletUuid, trx });
 
     const [destWallet] = await trx<Wallet>("wallet").select().where({ uuid: walletTransferDto.RecipientWalletId }).whereNull("wallet.disabled_date");
     if (!destWallet) throw new Error("invalid destination wallet id supplied");
@@ -33,11 +32,11 @@ export async function executeWalletTransfer(walletTransferDto: WalletTransferDto
   return { success: true };
 }
 
-export async function fundWallet(walletFundDto: WalletFundDto, userUuid: string, walletUuid: string) {
+export async function fundWallet(walletFundDto: WalletFundDto, userUuid: string, walletUuid: string, dbClient: Knex) {
   const trx = await dbClient.transaction();
 
   try {
-    const deepUserRecord = await fetchUserRecordDeep(userUuid, walletUuid, trx);
+    const deepUserRecord = await fetchUserRecordDeep({ userUuid, walletUuid, trx });
 
     // TODO: consider creating an endpoint for them to tokenize the card
     const card = await tokenizeOrfetchCard(userUuid, trx, walletFundDto.PayerEntityUuid, walletFundDto.PayerCardDetails);
@@ -54,11 +53,11 @@ export async function fundWallet(walletFundDto: WalletFundDto, userUuid: string,
   return { success: true };
 }
 
-export async function withdrawFromWallet(walletWithdrawalDto: WalletWithdrawalDto, userUuid: string, walletUuid: string) {
+export async function withdrawFromWallet(walletWithdrawalDto: WalletWithdrawalDto, userUuid: string, walletUuid: string, dbClient: Knex) {
   const trx = await dbClient.transaction();
 
   try {
-    const deepUserRecord = await fetchUserRecordDeep(userUuid, walletUuid, trx);
+    const deepUserRecord = await fetchUserRecordDeep({ userUuid, walletUuid, trx });
     const bankAccount = await fetchAccount(userUuid, trx, walletWithdrawalDto.PayeeEntityUuid, walletWithdrawalDto.PayeeBankAccountDetails);
 
     await withdrawFromWalletToBank(deepUserRecord.wallet, bankAccount, walletWithdrawalDto.Amount, trx);
@@ -74,16 +73,17 @@ export async function withdrawFromWallet(walletWithdrawalDto: WalletWithdrawalDt
   return { success: true };
 }
 
-async function fetchUserRecordDeep(userUuid: string, walletUuid: string, trx: Knex): Promise<{ user: User; wallet: Wallet }> {
+async function fetchUserRecordDeep(args: { userUuid: string; walletUuid?: string; trx: Knex }): Promise<{ user: User; wallet: Wallet }> {
+  const { userUuid, walletUuid, trx } = args;
   const [deepUserRecord] = (await trx
-    .from("User")
+    .from("user")
     .innerJoin("wallet", "user.entity_id", "wallet.owner_entity_id")
     .options({
       nestTables: true,
     })
     .where({ "user.uuid": userUuid })
     .whereNull("wallet.disabled_date")) as { user: User; wallet: Wallet }[];
-  if (!deepUserRecord || deepUserRecord.wallet.uuid !== walletUuid) throw new Error("no wallet found");
+  if (!deepUserRecord || (!!walletUuid && deepUserRecord.wallet.uuid !== walletUuid)) throw new Error("no wallet found");
 
   return deepUserRecord;
 }
@@ -161,4 +161,26 @@ async function tokenizeOrfetchCard(userUuid: string, trx: Knex, accountUuid?: st
   if (!card) throw new Error("invalid card details supplied");
 
   return card;
+}
+
+export async function fetchUserDetails(userUuid: string, dbClient: Knex) {
+  try {
+    const deepUserRecord = await fetchUserRecordDeep({ userUuid, trx: dbClient });
+
+    return {
+      success: true,
+      userUuid: userUuid,
+      first_name: deepUserRecord.user.first_name,
+      last_name: deepUserRecord.user.last_name,
+      wallet: {
+        uuid: deepUserRecord.wallet.uuid,
+        balance: deepUserRecord.wallet.balance,
+        last_updated_at: deepUserRecord.wallet.last_updated_at,
+      },
+    };
+  } catch (error: any) {
+    logger.error(error?.message, error?.stack);
+
+    return { success: false };
+  }
 }
