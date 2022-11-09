@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
-import { IsDateString, IsOptional, IsPositive, IsString, IsUUID, Min, ValidateIf, ValidateNested } from "class-validator";
-import 'reflect-metadata';
+import { IsDateString, IsOptional, IsPositive, IsString, IsUUID, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
+import "reflect-metadata";
 
 export class WalletTransferDto {
   @IsUUID()
@@ -94,6 +94,7 @@ export class WalletWithdrawalDto {
 
 export class PayeeBankAccountDetailsType {
   @IsString()
+  @MaxLength(10)
   AccountNumber: string;
 
   @IsString()

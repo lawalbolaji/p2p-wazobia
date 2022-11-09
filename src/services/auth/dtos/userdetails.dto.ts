@@ -40,11 +40,23 @@ export async function validateWrapper<T extends Object>(Schema: T, req: Request,
   if (errors.length) {
     res.status(400).json({
       status: 400,
-      message: errors.map((error) => Object.values(error.constraints || {})).join(";"),
+      message: extractErrors<ValidationError>(errors, ""),
     });
 
     return false;
   }
 
   return true;
+}
+
+function extractErrors<T extends { children?: T[]; constraints?: { [type: string]: string } }>(stream: T[], errors: string) {
+  for (const data of stream) {
+    if (!data.children || data.children.length === 0) {
+      errors += Object.values(data.constraints || {}).join("; ") + "; ";
+    } else {
+      errors += extractErrors(data.children, errors);
+    }
+  }
+
+  return errors;
 }

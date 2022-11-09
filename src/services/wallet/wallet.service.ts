@@ -5,15 +5,18 @@ import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
 import { DemoBankProcessor } from "../payment/base.payment.service";
 import { BankAccount } from "../../models/bank_account";
+import { Card } from "../../models/card";
 
-export async function transferFunds(sourceWallet: Wallet, destWalletId: number, amount: number, trx: Knex) {
+export async function transferFunds(sourceWallet: Wallet, destWallet: Wallet, amount: number, trx: Knex) {
   if (sourceWallet.balance < amount) throw new Error("insufficient balance");
 
   const timestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+  const trxUuid = uuidv4();
+
   await trx<Transaction>("transaction").insert({
-    uuid: uuidv4(),
-    payer_entity_id: sourceWallet.id,
-    payee_entity_id: destWalletId,
+    uuid: trxUuid,
+    payer_entity_id: sourceWallet.entity_id,
+    payee_entity_id: destWallet.entity_id,
     amount,
     created_at: timestamp,
   });
@@ -24,17 +27,18 @@ export async function transferFunds(sourceWallet: Wallet, destWalletId: number, 
 
   await trx<Wallet>("wallet")
     .update({ last_updated_at: timestamp, balance: trx.raw(`balance + ${amount}`) })
-    .where({ id: destWalletId });
+    .where({ id: destWallet.id });
 }
 
-export async function fundWalletWithCard(card: any, destWallet: Wallet, amount: number, trx: Knex) {
+export async function fundWalletWithCard(card: Card, destWallet: Wallet, amount: number, trx: Knex) {
   const paymentServiceProvider = new DemoBankProcessor();
+  const trxUuid = uuidv4();
 
   const timestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
   await trx<Transaction>("transaction").insert({
-    uuid: uuidv4(),
-    payer_entity_id: card.id,
-    payee_entity_id: destWallet.id,
+    uuid: trxUuid,
+    payer_entity_id: card.entity_id,
+    payee_entity_id: destWallet.entity_id,
     amount,
     created_at: timestamp,
   });
@@ -49,12 +53,15 @@ export async function fundWalletWithCard(card: any, destWallet: Wallet, amount: 
 
 export async function withdrawFromWalletToBank(sourceWallet: Wallet, destBankAccount: BankAccount, amount: number, trx: Knex) {
   const paymentServiceProvider = new DemoBankProcessor();
-
   const timestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+  const trxUuid = uuidv4();
+
+  if (sourceWallet.balance < amount) throw new Error("insufficient funds");
+
   await trx<Transaction>("transaction").insert({
-    uuid: uuidv4(),
-    payer_entity_id: sourceWallet.id,
-    payee_entity_id: destBankAccount.id,
+    uuid: trxUuid,
+    payer_entity_id: sourceWallet.entity_id,
+    payee_entity_id: destBankAccount.entity_id,
     amount,
     created_at: timestamp,
   });
