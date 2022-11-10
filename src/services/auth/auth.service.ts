@@ -31,7 +31,7 @@ export async function createNewUser(userDetails: UserDetailsDto, dbClient: Knex<
       });
       const [userEntity] = await trx<Entity>("entity").select("*").where({ uuid: user_uuid });
 
-      await trx<User>("User").insert({
+      await trx<User>("user").insert({
         email: userDetails.Email,
         password: hashedPassword,
         first_name: userDetails.FirstName,
