@@ -4,7 +4,7 @@
   "description": "a basic wallet, user can fund, withdraw and transfer to other users with a wallet",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build && node build/index.js",
+    "start": "npm run build && node ./build/index.js",
     "start:dev": "nodemon",
     "build": "rimraf ./build && tsc",
     "test": "jest",
