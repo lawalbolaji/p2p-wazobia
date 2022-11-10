@@ -2,7 +2,7 @@
 # lendsqr wallet
 
 ### Introduction
-lendsqr wallet is an open source wallet...
+lendsqr wallet is a fully functionaly wallet service that enables users to create wallets, fund the wallets, transfer to other wallets and withdraw their funds.
 
 ### lendsqr wallet Features
 * Users can signup and login to their accounts
