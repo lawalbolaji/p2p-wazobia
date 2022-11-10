@@ -22,11 +22,13 @@ lendsqr wallet is an open source wallet...
 ### API Endpoints
 | HTTP Verbs | Endpoints | Action |
 | --- | --- | --- |
+| GET | /api/v1/auth/create-account | To check that app is up and running |
 | POST | /api/v1/auth/create-account | To create a new user account and wallet |
 | POST | /api/v1/auth/login | To login an existing user account |
-| POST | /api/v1/user/:userId/wallet/:walletId/fund | To fund wallet |
-| POST | /api/v1/user/:userId/wallet/:walletId/transfer | To transfer between wallets |
-| POST | /api/v1/user/:userId/wallet/:walletId/withdraw | withdraw from wallet |
+| GET | /api/v1/users/:userId | To fetch user details including walletId, balance etc. |
+| POST | /api/v1/users/:userId/wallet/:walletId/fund | To fund wallet |
+| POST | /api/v1/users/:userId/wallet/:walletId/transfer | To transfer between wallets |
+| POST | /api/v1/users/:userId/wallet/:walletId/withdraw | withdraw from wallet |
 
 ### Technologies Used
 * [NodeJS](https://nodejs.org/) This is a cross-platform runtime environment built on Chrome's V8 JavaScript engine used in running JavaScript codes on the server. It allows for installation and managing of dependencies and communication with databases.
