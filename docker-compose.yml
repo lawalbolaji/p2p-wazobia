@@ -1,0 +1,20 @@
+version: "1"
+
+services:
+  p2p_wazobia_db:
+    image: mysql/mysql-server:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 
+    volumes:
+      - p2p_wazobia_data:/data/db
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+volumes:
+  p2p_wazobia_data:
+    external: false
