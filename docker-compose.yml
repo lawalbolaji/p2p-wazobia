@@ -3,7 +3,7 @@ version: "3.3"
 services:
   p2p_wazobia_db:
     image: mysql/mysql-server:latest
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_USER: ${DATABASE_USER}
