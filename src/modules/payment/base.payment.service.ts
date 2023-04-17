@@ -1,18 +1,10 @@
-/**
- * assumptions:
- * 1. account can only be funded via card through an external processor
- * 2. withdrawals will be done to a bank account through an external processor
- */
 export interface IPaymentServiceProvider {
-  processBankTransfer(): boolean;
-  processCardPayment(): boolean;
+  chargeSource(...args: any): Promise<MockResponse>;
+  payoutToBank(...agrs: any): Promise<MockResponse>;
 }
 
-export class DemoBankProcessor implements IPaymentServiceProvider {
-  processBankTransfer() {
-    return true;
-  }
-  processCardPayment() {
-    return true;
-  }
-}
+export type MockResponse = {
+  amount: number;
+  token: string;
+  status: "success";
+};
