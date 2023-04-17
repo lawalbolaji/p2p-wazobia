@@ -10,11 +10,10 @@ services:
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_ROOT_PASSWORD: 
     volumes:
-      - p2p_wazobia_data:/data/db
+      - mysql_volume:/etc
     ports:
       - "3306:3306"
     expose:
       - 3306
 volumes:
-  p2p_wazobia_data:
-    external: false
+  mysql_volume:
