@@ -14,7 +14,7 @@ export class UsersController {
   async updateUser(req: express.Request, res: express.Response) {}
 
   async createUser(req: express.Request, res: express.Response) {
-    const token = await this.usersService.create(req.body);
+    const token = await this.usersService.registerNewUser(req.body);
     if (!!token) return res.status(201).json({ token });
 
     return res.status(403).json({ message: "unable to create account" });
