@@ -18,8 +18,6 @@ export class AuthMiddleware {
       if (await bcrypt.compare(req.body.password, user.password)) {
         req.body = {
           userId: user.uuid,
-          // email: user.email,
-          // permissionFlags: user.permissionFlags,
         };
 
         return next();
