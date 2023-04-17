@@ -12,6 +12,8 @@ export class ChargeRoutes extends CommonRoutesConfig {
     private readonly chargeController: ChargeController
   ) {
     super(app, "Charge Routes");
+
+    this.configureRoutes();
   }
 
   configureRoutes(): express.Application {

@@ -12,6 +12,8 @@ export class TransferRoutes extends CommonRoutesConfig {
     private readonly transferController: TransferController
   ) {
     super(app, "Transfer Routes");
+
+    this.configureRoutes();
   }
 
   configureRoutes(): express.Application {

@@ -1,11 +1,9 @@
-import { Type } from "class-transformer";
 import { IsPositive, Min } from "class-validator";
 import { IsUUID } from "class-validator";
 
 export class CreateChargeDto {
   @IsPositive()
   @Min(100)
-  @Type(() => Number)
   amount: number;
 
   /*

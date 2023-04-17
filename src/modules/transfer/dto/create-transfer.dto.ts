@@ -1,10 +1,8 @@
-import { Type } from "class-transformer";
 import { IsOptional, IsPositive, IsString, IsUUID, Min } from "class-validator";
 
 export class CreateTransferDto {
   @IsPositive()
   @Min(100)
-  @Type(() => Number)
   amount: number;
 
   @IsUUID()
