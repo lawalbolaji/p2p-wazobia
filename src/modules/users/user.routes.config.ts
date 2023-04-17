@@ -12,8 +12,6 @@ export class UserRoutes extends CommonRoutesConfig {
     private readonly jwtMiddleware: JwtMiddleware
   ) {
     super(app, "User Routes");
-
-    this.configureRoutes();
   }
 
   configureRoutes(): express.Application {
