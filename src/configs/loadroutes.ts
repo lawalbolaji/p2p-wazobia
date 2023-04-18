@@ -63,12 +63,12 @@ export const loadRoutes = (app: express.Application) => {
   const bankAccountController = new BankAccountController(bankAccountService);
 
   routes.push(new AuthRoutes(app, authMiddleware, authController, jwtMiddleware));
+  routes.push(new CardRoutes(app, jwtMiddleware, cardMiddleware, cardController));
+  routes.push(new BankAccountRoutes(app, jwtMiddleware, bankAccountMiddleware, bankAccountController));
   routes.push(new UserRoutes(app, usersMiddleware, usersController, jwtMiddleware));
   routes.push(new ChargeRoutes(app, jwtMiddleware, chargeMiddleware, chargeController));
   routes.push(new PayoutRoutes(app, jwtMiddleware, payoutMiddleware, payoutController));
   routes.push(new TransferRoutes(app, jwtMiddleware, transferMiddleware, transferController));
-  routes.push(new CardRoutes(app, jwtMiddleware, cardMiddleware, cardController));
-  routes.push(new BankAccountRoutes(app, jwtMiddleware, bankAccountMiddleware, bankAccountController));
 
   return routes;
 };
