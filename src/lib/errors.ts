@@ -1,4 +1,8 @@
 /**
+ * convert
+ * {error1: {...}, children: [{error2: {...}, children: [...]}]}
+ * to
+ * "error1"."error2"...
  * the function recurses through the error object and returns the error as a single string
  * @param stream the default error stream from class-validator
  * @param errors a placeholder for the values for successive recursive calls
