@@ -12,9 +12,9 @@ import { loadRoutes } from "./configs/loadroutes";
 dotenv.config();
 
 const app: express.Application = express();
+const v1App: express.Application = express();
 const server: http.Server = http.createServer(app);
 const port = process.env.PORT || 3100;
-const rootUrl = process.env.ROOT_URL || "http://localhost";
 const debugLog: debug.IDebugger = debug("app");
 
 app.use(helmet());
@@ -30,7 +30,9 @@ const loggerOptions: expressWinston.LoggerOptions = {
   format: winston.format.combine(
     winston.format.json(),
     winston.format.prettyPrint(),
-    winston.format.colorize({ all: true })
+    winston.format.colorize({
+      all: true,
+    })
   ),
   meta: !!process.env.DEBUG,
 };
@@ -43,8 +45,10 @@ app.get("/", (req: express.Request, res: express.Response) => {
   res.status(200).send(runningMessage);
 });
 
+app.use("/api/v1", v1App);
+
 server.listen(port, () => {
-  loadRoutes(app).forEach((route: CommonRoutesConfig) => {
+  loadRoutes(v1App).forEach((route: CommonRoutesConfig) => {
     debugLog(`Routes configured for ${route.getName()}`);
   });
 
