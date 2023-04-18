@@ -4,21 +4,21 @@ import { JwtMiddleware } from "../auth/middleware/jwt.middleware";
 import { CardMiddleware } from "./middleware/card.middleware";
 import { CardController } from "./controller/card.controller";
 
-export class TransferRoutes extends CommonRoutesConfig {
+export class CardRoutes extends CommonRoutesConfig {
   constructor(
     app: express.Application,
     private readonly jwtMiddleware: JwtMiddleware,
     private readonly cardMiddleware: CardMiddleware,
     private readonly cardController: CardController
   ) {
-    super(app, "Transfer Routes");
+    super(app, "Card Routes");
 
     this.configureRoutes();
   }
 
   configureRoutes(): express.Application {
     this.app
-      .route("user/:userId/bankaccounts")
+      .route("user/:userId/cards")
       .all(this.jwtMiddleware.validJWTNeeded)
       .get([this.cardMiddleware.validateRequiredFields, this.cardController.listCardsByUserId])
       .post([this.cardMiddleware.validateRequiredFields, this.cardController.createCard]);

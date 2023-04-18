@@ -4,14 +4,14 @@ import { JwtMiddleware } from "../auth/middleware/jwt.middleware";
 import { BankAccountMiddleware } from "./middleware/bankaccount.middleware";
 import { BankAccountController } from "./controller/bankaccount.controller";
 
-export class TransferRoutes extends CommonRoutesConfig {
+export class BankAccountRoutes extends CommonRoutesConfig {
   constructor(
     app: express.Application,
     private readonly jwtMiddleware: JwtMiddleware,
     private readonly bankAccountMiddleware: BankAccountMiddleware,
     private readonly bankAccountController: BankAccountController
   ) {
-    super(app, "Transfer Routes");
+    super(app, "BankAccount Routes");
 
     this.configureRoutes();
   }
