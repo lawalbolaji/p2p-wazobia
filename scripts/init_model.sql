@@ -292,7 +292,7 @@ SHOW WARNINGS$$
 USE `p2p_wazobia_db`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`card_BEFORE_INSERT` BEFORE INSERT ON `card` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 3, NEW.ext_token, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 3, NEW.ext_token, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
 END$$
@@ -305,7 +305,7 @@ SHOW WARNINGS$$
 USE `p2p_wazobia_db`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`user_BEFORE_INSERT` BEFORE INSERT ON `user` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 1, new.uuid, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 1, new.uuid, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
     SET NEW.created_at = current_timestamp();
