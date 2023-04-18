@@ -20,8 +20,8 @@ export class PayoutService {
     private readonly paymentServiceProvider: DemoPaymentProcessor
   ) {}
 
-  async createPayout(params: { destination: string; amount: number; userId: string; extTrx?: Knex }) {
-    const { amount, destination, userId, extTrx } = params;
+  async createPayout(params: { destination: string; amount: number; userEntityId: number; extTrx?: Knex }) {
+    const { amount, destination, userEntityId, extTrx } = params;
     const payoutUuid = uuidv4();
     const trx = extTrx || (await this.dbClient.transaction());
 
@@ -30,6 +30,7 @@ export class PayoutService {
       amount: amount,
       status: "pending",
       destination: destination,
+      user_entity_id: userEntityId,
     });
 
     return payoutUuid;
@@ -58,7 +59,7 @@ export class PayoutService {
       const createPayoutOptions = {
         amount: createPayoutDto.amount,
         destination: ownerBankAccount.ext_token,
-        userId,
+        userEntityId: deepUserRecord.user.entity_id,
         trx,
       };
       const payoutUuid = await this.createPayout(createPayoutOptions);

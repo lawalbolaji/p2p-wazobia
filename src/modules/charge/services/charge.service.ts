@@ -18,8 +18,8 @@ export class ChargeService {
     private readonly paymentServiceProvider: DemoPaymentProcessor
   ) {}
 
-  async createCharge(params: { source: string; amount: number; userId: string; extTrx?: Knex }) {
-    const { amount, source, userId, extTrx } = params;
+  async createCharge(params: { source: string; amount: number; userEntityId: number; extTrx?: Knex }) {
+    const { amount, source, userEntityId: userEntityId, extTrx } = params;
     const trx = extTrx || (await this.dbClient.transaction());
     const chargeUuid = uuidv4();
 
@@ -28,7 +28,7 @@ export class ChargeService {
       source,
       amount,
       status: "pending",
-      user_id: userId,
+      user_entity_id: userEntityId,
     });
 
     return chargeUuid;
@@ -54,55 +54,57 @@ export class ChargeService {
     } | null = null;
 
     try {
-      const createChargeOptions = {
-        amount: createChargeDto.amount,
-        source: createChargeDto.source,
-        userId,
-        iTrx,
-      };
-      chargeUuid = await this.createCharge(createChargeOptions);
-      chargeSourceResult = await this.paymentServiceProvider.chargeSource(
-        createChargeDto.amount,
-        createChargeDto.source
-      );
-
-      iTrx.commit();
-    } catch (error: any) {
-      iTrx.rollback();
-
-      log(error?.message, error?.stack);
-      throw error;
-    }
-
-    try {
-      // update wallet balance
-      if (!!chargeSourceResult && chargeSourceResult.status === "success") {
-        const trx = await this.dbClient.transaction();
-
-        try {
-          const deepUserRecord = await this.usersService.fetchUserRecordDeep({ userUuid: userId, trx });
-          await this.walletService.addMoneyToWallet(createChargeDto.amount, deepUserRecord.wallet.id, trx);
-
-          if (chargeUuid === null) throw new Error("error completing request");
-          await this.updateChargeStatus(chargeUuid, "completed", trx);
-
-          trx.commit();
-        } catch (error: any) {
-          log(error?.message, error?.stack);
-
-          trx.rollback();
-          // TODO: do a refund, since this will have a charge record that never completed
-        }
-        return {
-          _id: chargeUuid,
-          amount: chargeSourceResult.amount,
-          status: chargeSourceResult.status,
+      const deepUserRecord = await this.usersService.fetchUserRecordDeep({ userUuid: userId, trx: iTrx });
+      try {
+        const createChargeOptions = {
+          amount: createChargeDto.amount,
+          source: createChargeDto.source,
+          userEntityId: deepUserRecord.user.entity_id,
+          iTrx,
         };
+        chargeUuid = await this.createCharge(createChargeOptions);
+        chargeSourceResult = await this.paymentServiceProvider.chargeSource(
+          createChargeDto.amount,
+          createChargeDto.source
+        );
+
+        iTrx.commit();
+      } catch (error: any) {
+        iTrx.rollback();
+
+        log(error?.message, error?.stack);
+        throw error;
       }
-    } catch (error: any) {
-      log(error?.message, error?.stack);
-      throw error;
-    }
+
+      try {
+        // update wallet balance
+        if (!!chargeSourceResult && chargeSourceResult.status === "success") {
+          const trx = await this.dbClient.transaction();
+
+          try {
+            await this.walletService.addMoneyToWallet(createChargeDto.amount, deepUserRecord.wallet.id, trx);
+
+            if (chargeUuid === null) throw new Error("error completing request");
+            await this.updateChargeStatus(chargeUuid, "completed", trx);
+
+            trx.commit();
+          } catch (error: any) {
+            log(error?.message, error?.stack);
+
+            trx.rollback();
+            // TODO: do a refund, since this will have a charge record that never completed
+          }
+          return {
+            _id: chargeUuid,
+            amount: chargeSourceResult.amount,
+            status: chargeSourceResult.status,
+          };
+        }
+      } catch (error: any) {
+        log(error?.message, error?.stack);
+        throw error;
+      }
+    } catch (error) {}
   }
 
   async getChargeDetails() {}

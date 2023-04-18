@@ -20,10 +20,10 @@ export class TransferService {
     amount: number;
     sourceWalletId: number;
     destinationWalletId: number;
-    userId: string;
+    userEntityId: number;
     extTrx?: Knex;
   }) {
-    const { amount, sourceWalletId, destinationWalletId, userId, extTrx } = params;
+    const { amount, sourceWalletId, destinationWalletId, userEntityId, extTrx } = params;
     const trx = extTrx || (await this.dbClient.transaction());
     const transferUuid = uuidv4();
 
@@ -32,7 +32,7 @@ export class TransferService {
       source_wallet_id: sourceWalletId,
       destination_wallet_id: destinationWalletId,
       amount: amount,
-      user_id: userId,
+      user_entity_id: userEntityId,
       status: "pending",
     });
 
@@ -63,7 +63,7 @@ export class TransferService {
         amount: createTransferDto.amount,
         sourceWalletId: deepUserRecord.wallet.id,
         destinationWalletId: destinationWallet.id,
-        userId,
+        userEntityId: deepUserRecord.user.entity_id,
         trx,
       };
 

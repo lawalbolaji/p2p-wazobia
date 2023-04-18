@@ -7,6 +7,7 @@ import { Wallet } from "../../../db_models/wallet";
 import { CreateUserDto } from "../dto/create.user.dto";
 import { WalletService } from "../../wallet/services/wallet.service";
 import { AuthService } from "../../auth/services/auth.service";
+import { Entity } from "../../../db_models/entity";
 
 dotenv.config();
 const log: debug.IDebugger = debug("app:users-service");
