@@ -1,51 +1,48 @@
-import { format } from "date-fns";
+import debug from "debug";
 import { Knex } from "knex";
-import { BankAccount } from "../../../db_models/bank_account";
+import { CreateBankAccountDto } from "../dto/createbankaccount.dto";
 import { Entity } from "../../../db_models/entity";
-import { v4 as uuidv4 } from "uuid";
-import { PayeeBankAccountDetailsType } from "../../transaction/dto/w2bdebitrequest.dto";
+import { BankAccount } from "../../../db_models/bankaccount";
+import { DemoPaymentProcessor } from "../../payment/services/demo.payment.service";
+
+const log: debug.IDebugger = debug("app:bankaccount-service");
 
 export class BankAccountService {
-  constructor() {}
+  constructor(private readonly dbClient: Knex) {}
 
-  async fetchAccount(
-    userUuid: string,
-    trx: Knex,
-    accountUuid?: string,
-    payeeBankAccountDetailsType?: PayeeBankAccountDetailsType
-  ) {
-    let bankAccount: BankAccount;
-    const timestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-    const bankUuid = uuidv4();
+  async createUserBankAccount(createBankAccountDto: CreateBankAccountDto, userId: string) {
+    let paymentServiceProvider: DemoPaymentProcessor | null = new DemoPaymentProcessor();
 
-    if (!accountUuid && payeeBankAccountDetailsType?.AccountNumber) {
-      await trx<Entity>("entity").insert({
-        uuid: bankUuid,
-        entity_type_id: 3, // bank_account
-        created_at: timestamp,
-        last_updated_at: timestamp,
-      });
-      const queryResult = await trx<Entity>("entity").select("id", "uuid").whereIn("uuid", [bankUuid, userUuid]);
-      const [ownerEntity] = queryResult.filter((el) => el.uuid === userUuid);
-      const [bankEntity] = queryResult.filter((el) => el.uuid === bankUuid);
+    const trx = await this.dbClient.transaction();
+    try {
+      const account = await this.getUserBankAccount(userId, trx);
+      if (account !== undefined) throw new Error("user bank account already exists");
 
-      if (!ownerEntity) throw new Error(`unable to find owner entity record for userUuid: ${userUuid}`);
-
-      await trx<BankAccount>("bank_account").insert({
-        uuid: bankUuid,
-        entity_id: bankEntity.id,
-        owner_entity_id: ownerEntity.id,
-        account_number: payeeBankAccountDetailsType?.AccountNumber,
+      const token = await paymentServiceProvider.tokenizeBankAccount(createBankAccountDto);
+      const [userEntity] = await trx<Entity>("entity").where("uuid", userId);
+      await trx<BankAccount>("bankaccount").insert({
+        ext_token: token,
+        owner_entity_id: userEntity.id,
+        last4: createBankAccountDto.AccountNumber.slice(-4),
       });
 
-      bankAccount = (await trx<BankAccount>("bank_account").select("*").where({ uuid: bankUuid }))[0];
-    } else {
-      bankAccount = (
-        await trx<BankAccount>("bank_account").select().where({ uuid: accountUuid }).whereNull("disabled_date")
-      )[0];
+      await trx.commit();
+      paymentServiceProvider = null;
+
+      return {
+        token,
+      };
+    } catch (error: any) {
+      await trx.rollback();
+
+      log(error?.message, error?.stack);
     }
+  }
 
-    if (!bankAccount) throw new Error("invalid bank account supplied");
+  async getUserBankAccount(userId: string, extTrx?: Knex) {
+    const trx = extTrx || (await this.dbClient.transaction());
+    const [userEntity] = await trx<Entity>("entity").where("uuid", userId);
+    const [bankAccount] = await trx<BankAccount>("bankaccount").where("owner_entity_id", userEntity.id);
 
     return bankAccount;
   }
