@@ -6,7 +6,6 @@ dotenv.config();
 const log: debug.IDebugger = debug("app:knex-service");
 
 export class KnexService {
-  private count = 0; // for retries
   private connectionOptions = {
     host: process.env.DATABASE_HOST,
     port: +(process.env.DATABASE_PORT || 3106),
@@ -17,20 +16,20 @@ export class KnexService {
   private dbClient: Knex;
 
   constructor() {
-    this.connectWithRetry();
+    this.createConnectionPool();
   }
 
   getKnex() {
     return this.dbClient;
   }
 
-  connectWithRetry() {
-    // TODO: create pool of database connections
-    log("Attempting Database connection (will retry if needed)");
+  createConnectionPool() {
+    log("Attempting Database connection");
 
     this.dbClient = knex({
       client: "mysql2",
       connection: this.connectionOptions,
+      pool: { min: 0, max: 5 },
     });
 
     this.dbClient
