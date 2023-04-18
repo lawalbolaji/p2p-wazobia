@@ -6,7 +6,7 @@ export class ChargeController {
 
   async createCharge(req: express.Request, res: express.Response) {
     try {
-      const result = await this.chargeService.createNewCharge(req.body, req.body.userId);
+      const result = await this.chargeService.executeCharge(req.body, req.body.userId);
 
       return res.status(201).json(result);
     } catch (error) {

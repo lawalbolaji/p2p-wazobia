@@ -14,12 +14,39 @@ export class ChargeService {
   constructor(
     private readonly dbClient: Knex,
     private readonly usersService: UsersService,
-    private readonly walletService: WalletService
+    private readonly walletService: WalletService,
+    private readonly paymentServiceProvider: DemoPaymentProcessor
   ) {}
 
-  async createNewCharge(createChargeDto: CreateChargeDto, userId: string) {
-    const iTrx = await this.dbClient.transaction();
+  async createCharge(params: { source: string; amount: number; userId: string; extTrx?: Knex }) {
+    const { amount, source, userId, extTrx } = params;
+    const trx = extTrx || (await this.dbClient.transaction());
     const chargeUuid = uuidv4();
+
+    await trx<Charge>("charge").insert({
+      uuid: chargeUuid,
+      source,
+      amount,
+      status: "pending",
+      user_id: userId,
+    });
+
+    return chargeUuid;
+  }
+
+  async updateChargeStatus(chargeUuid: string, status: "pending" | "completed" | "returned", extTrx?: Knex) {
+    const trx = extTrx || (await this.dbClient.transaction());
+
+    await trx<Charge>("charge")
+      .update({
+        status,
+      })
+      .where("uuid", chargeUuid);
+  }
+
+  async executeCharge(createChargeDto: CreateChargeDto, userId: string) {
+    const iTrx = await this.dbClient.transaction();
+    let chargeUuid: string | null = null;
     let chargeSourceResult: {
       amount: number;
       token: string;
@@ -27,14 +54,17 @@ export class ChargeService {
     } | null = null;
 
     try {
-      await iTrx<Charge>("charge").insert({
-        uuid: chargeUuid,
-        source: createChargeDto.source,
+      const createChargeOptions = {
         amount: createChargeDto.amount,
-        status: "pending",
-      });
-      const paymentServiceProvider = new DemoPaymentProcessor();
-      chargeSourceResult = await paymentServiceProvider.chargeSource(createChargeDto.amount, createChargeDto.source);
+        source: createChargeDto.source,
+        userId,
+        iTrx,
+      };
+      chargeUuid = await this.createCharge(createChargeOptions);
+      chargeSourceResult = await this.paymentServiceProvider.chargeSource(
+        createChargeDto.amount,
+        createChargeDto.source
+      );
 
       iTrx.commit();
     } catch (error: any) {
@@ -53,21 +83,18 @@ export class ChargeService {
           const deepUserRecord = await this.usersService.fetchUserRecordDeep({ userUuid: userId, trx });
           await this.walletService.addMoneyToWallet(createChargeDto.amount, deepUserRecord.wallet.id, trx);
 
-          await trx<Charge>("charge")
-            .update({
-              status: "completed",
-            })
-            .where("uuid", chargeUuid);
+          if (chargeUuid === null) throw new Error("error completing request");
+          await this.updateChargeStatus(chargeUuid, "completed", trx);
 
           trx.commit();
         } catch (error: any) {
           log(error?.message, error?.stack);
 
           trx.rollback();
-          // do a refund, since this will have a charge record with status pending
+          // TODO: do a refund, since this will have a charge record that never completed
         }
         return {
-          _id: "charge_id",
+          _id: chargeUuid,
           amount: chargeSourceResult.amount,
           status: chargeSourceResult.status,
         };

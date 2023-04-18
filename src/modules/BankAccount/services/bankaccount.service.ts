@@ -8,17 +8,15 @@ import { DemoPaymentProcessor } from "../../payment/services/demo.payment.servic
 const log: debug.IDebugger = debug("app:bankaccount-service");
 
 export class BankAccountService {
-  constructor(private readonly dbClient: Knex) {}
+  constructor(private readonly dbClient: Knex, private readonly paymentServiceProvider: DemoPaymentProcessor) {}
 
   async createUserBankAccount(createBankAccountDto: CreateBankAccountDto, userId: string) {
-    let paymentServiceProvider: DemoPaymentProcessor | null = new DemoPaymentProcessor();
-
     const trx = await this.dbClient.transaction();
     try {
       const account = await this.getUserBankAccount(userId, trx);
       if (account !== undefined) throw new Error("user bank account already exists");
 
-      const token = await paymentServiceProvider.tokenizeBankAccount(createBankAccountDto);
+      const token = await this.paymentServiceProvider.tokenizeBankAccount(createBankAccountDto);
       const [userEntity] = await trx<Entity>("entity").where("uuid", userId);
       await trx<BankAccount>("bankaccount").insert({
         ext_token: token,
@@ -27,11 +25,8 @@ export class BankAccountService {
       });
 
       await trx.commit();
-      paymentServiceProvider = null;
 
-      return {
-        token,
-      };
+      return { token };
     } catch (error: any) {
       await trx.rollback();
 

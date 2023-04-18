@@ -8,14 +8,12 @@ import { DemoPaymentProcessor } from "../../payment/services/demo.payment.servic
 const log: debug.IDebugger = debug("app:card-service");
 
 export class CardService {
-  constructor(private readonly dbClient: Knex) {}
+  constructor(private readonly dbClient: Knex, private readonly paymentServiceProvider: DemoPaymentProcessor) {}
 
   async createCard(createCardDto: CreateCardDto, userId: string) {
-    let paymentServiceProvider: DemoPaymentProcessor | null = new DemoPaymentProcessor();
-
     const trx = await this.dbClient.transaction();
     try {
-      const token = await paymentServiceProvider.tokenizeCard(createCardDto);
+      const token = await this.paymentServiceProvider.tokenizeCard(createCardDto);
       const [userEntity] = await trx<Entity>("entity").where("uuid", userId);
       await trx<Card>("card").insert({
         ext_token: token,
@@ -24,7 +22,6 @@ export class CardService {
       });
 
       await trx.commit();
-      paymentServiceProvider = null;
 
       return {
         token,

@@ -13,6 +13,12 @@ export class WalletService {
     return wallet;
   }
 
+  async getWalletById(walletId: string, extTrx?: Knex){
+    const [wallet] = await this.dbClient<Wallet>("wallet").where("uuid", walletId);
+    
+    return wallet;
+  }
+
   createNewUserWallet(owner_entity_id: number, trx: Knex) {
     const wallet_uuid = uuidv4();
 

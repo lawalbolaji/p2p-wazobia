@@ -6,7 +6,7 @@ export class PayoutController {
 
   async createPayout(req: express.Request, res: express.Response) {
     try {
-      const result = await this.payoutService.createNewPayout(req.body, req.body.userId);
+      const result = await this.payoutService.executePayout(req.body, req.body.userId);
 
       return res.status(201).json(result);
     } catch (error) {

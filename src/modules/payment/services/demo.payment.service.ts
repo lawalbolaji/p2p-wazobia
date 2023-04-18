@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { IPaymentServiceProvider, MockResponse } from "../base.payment.service";
 
 export class DemoPaymentProcessor implements IPaymentServiceProvider {
@@ -9,12 +10,21 @@ export class DemoPaymentProcessor implements IPaymentServiceProvider {
     return this.simulateDelayedProcessing({ amount, token, status: "success" });
   }
 
-  private simulateDelayedProcessing(mockDataResponse: MockResponse): Promise<MockResponse> {
+  tokenizeCard(...args: any): Promise<string> {
+    const token = uuidv4();
+    return this.simulateDelayedProcessing(token);
+  }
+
+  tokenizeBankAccount(...args: any): Promise<string> {
+    const token = uuidv4();
+    return this.simulateDelayedProcessing(token);
+  }
+
+  private simulateDelayedProcessing<T>(mockDataResponse: T): Promise<T> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const status = Math.random() * 10;
-        if (status < 5)
-          resolve({ amount: mockDataResponse.amount, token: mockDataResponse.token, status: mockDataResponse.status });
+        if (status < 5) resolve(mockDataResponse);
 
         reject("Insufficient Balance");
       }, Math.random());
