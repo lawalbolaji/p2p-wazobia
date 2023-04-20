@@ -3,7 +3,7 @@ import { Knex } from "knex";
 import { CreateChargeDto } from "../dto/create-charge.dto";
 import { UsersService } from "../../users/services/users.service";
 import { WalletService } from "../../wallet/services/wallet.service";
-import { Charge } from "../../../db_models/charge";
+import { Charge } from "../../../database/models/charge";
 import { v4 as uuidv4 } from "uuid";
 import { DemoPaymentProcessor } from "../../payment/services/demo.payment.service";
 import { MockResponse } from "../../payment/base.payment.service";

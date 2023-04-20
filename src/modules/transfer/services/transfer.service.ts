@@ -1,7 +1,7 @@
 import debug from "debug";
 import { v4 as uuidv4 } from "uuid";
 import { Knex } from "knex";
-import { Transfer } from "../../../db_models/transfer";
+import { Transfer } from "../../../database/models/transfer";
 import { UsersService } from "../../users/services/users.service";
 import { CreateTransferDto } from "../dto/create-transfer.dto";
 import { WalletService } from "../../wallet/services/wallet.service";

@@ -1,8 +1,8 @@
 import debug from "debug";
 import { Knex } from "knex";
 import { CreateBankAccountDto } from "../dto/createbankaccount.dto";
-import { Entity } from "../../../db_models/entity";
-import { BankAccount } from "../../../db_models/bankaccount";
+import { Entity } from "../../../database/models/entity";
+import { BankAccount } from "../../../database/models/bankaccount";
 import { DemoPaymentProcessor } from "../../payment/services/demo.payment.service";
 
 const log: debug.IDebugger = debug("app:bankaccount-service");

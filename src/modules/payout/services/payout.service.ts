@@ -4,7 +4,7 @@ import { UsersService } from "../../users/services/users.service";
 import { CreatePayoutDto } from "../dto/create-payout.dto";
 import { v4 as uuidv4 } from "uuid";
 import { WalletService } from "../../wallet/services/wallet.service";
-import { Payout } from "../../../db_models/payout";
+import { Payout } from "../../../database/models/payout";
 import { DemoPaymentProcessor } from "../../payment/services/demo.payment.service";
 import { BankAccountService } from "../../bankaccount/services/bankaccount.service";
 

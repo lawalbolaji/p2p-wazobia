@@ -1,7 +1,7 @@
 import debug from "debug";
 import { Knex } from "knex";
-import { Card } from "../../../db_models/card";
-import { Entity } from "../../../db_models/entity";
+import { Card } from "../../../database/models/card";
+import { Entity } from "../../../database/models/entity";
 import { CreateCardDto } from "../dto/createcard.dto";
 import { DemoPaymentProcessor } from "../../payment/services/demo.payment.service";
 

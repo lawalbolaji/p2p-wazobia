@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { Wallet } from "../../../db_models/wallet";
+import { Wallet } from "../../../database/models/wallet";
 import { v4 as uuidv4 } from "uuid";
 
 export class WalletService {

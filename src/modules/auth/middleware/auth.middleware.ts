@@ -1,6 +1,6 @@
 import express from "express";
 import debug from "debug";
-import { User } from "../../../db_models/user";
+import { User } from "../../../database/models/user";
 import * as bcrypt from "bcrypt";
 import { AuthRequestDto } from "../dtos/authrequest.dto";
 import { validateWrapper } from "../../../lib/validator";

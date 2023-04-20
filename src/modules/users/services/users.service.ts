@@ -2,12 +2,12 @@ import debug from "debug";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import { Knex } from "knex";
-import { User } from "../../../db_models/user";
-import { Wallet } from "../../../db_models/wallet";
+import { User } from "../../../database/models/user";
+import { Wallet } from "../../../database/models/wallet";
 import { CreateUserDto } from "../dto/create.user.dto";
 import { WalletService } from "../../wallet/services/wallet.service";
 import { AuthService } from "../../auth/services/auth.service";
-import { Entity } from "../../../db_models/entity";
+import { Entity } from "../../../database/models/entity";
 
 dotenv.config();
 const log: debug.IDebugger = debug("app:users-service");
