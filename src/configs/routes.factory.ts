@@ -1,3 +1,4 @@
+import { knexConfig } from "../database/knexfile";
 import { AuthRoutes } from "../modules/auth/auth.routes.config";
 import { AuthController } from "../modules/auth/controllers/auth.controller";
 import { AuthMiddleware } from "../modules/auth/middleware/auth.middleware";
@@ -36,7 +37,7 @@ import express from "express";
 export const loadRoutes = (app: express.Application) => {
   const routes: Array<CommonRoutesConfig> = [];
 
-  const dbClient = new KnexService().getKnex();
+  const dbClient = new KnexService(knexConfig).getKnex();
   const paymentServiceProvider = new DemoPaymentProcessor();
   const walletService = new WalletService(dbClient);
   const bankAccountService = new BankAccountService(dbClient, paymentServiceProvider);

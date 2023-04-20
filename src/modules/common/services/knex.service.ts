@@ -6,16 +6,11 @@ dotenv.config();
 const log: debug.IDebugger = debug("app:knex-service");
 
 export class KnexService {
-  private connectionOptions = {
-    host: process.env.DATABASE_HOST,
-    port: +(process.env.DATABASE_PORT || 3106),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME,
-  };
   private dbClient: Knex;
+  private config: Knex.Config;
 
-  constructor() {
+  constructor(config: Knex.Config) {
+    this.config = config;
     this.createConnectionPool();
   }
 
@@ -26,12 +21,7 @@ export class KnexService {
   createConnectionPool() {
     log("Attempting Database connection");
 
-    this.dbClient = knex({
-      client: "mysql2",
-      connection: this.connectionOptions,
-      pool: { min: 0, max: 5 },
-    });
-
+    this.dbClient = knex(this.config);
     this.dbClient
       .raw("SELECT VERSION()")
       .then((version: any) => {
