@@ -13,52 +13,50 @@ dotenv.config();
 const log: debug.IDebugger = debug("app:users-service");
 
 export class UsersService {
-  constructor(
-    private readonly dbClient: Knex,
-    private readonly walletService: WalletService,
-    private readonly authService: AuthService
-  ) {}
+  constructor(private readonly dbClient: Knex, private readonly walletService: WalletService, private readonly authService: AuthService) {}
 
-  async createUser(user_uuid: string, userDetails: CreateUserDto, trx: Knex) {
-    return trx<User>("user").insert({
+  async createUser(userDetails: CreateUserDto, trx: Knex) {
+    const userUuid = uuidv4();
+
+    await trx<User>("user").insert({
       email: userDetails.email,
       password: userDetails.password,
       first_name: userDetails.firstName,
       last_name: userDetails.lastName,
-      uuid: user_uuid,
+      uuid: userUuid,
     });
+
+    return userUuid;
   }
 
   async registerNewUser(userDetails: CreateUserDto): Promise<{ token: string; refreshToken: string } | false> {
-    const user_uuid = uuidv4();
-
+    let userUuid: string | null = null;
     try {
       await this.dbClient.transaction(async (trx: Knex) => {
-        const [owner_entity_id] = await this.createUser(
-          user_uuid,
-          { ...userDetails, password: await this.authService.hashUserPassword(userDetails.password) },
-          trx
-        );
-        await this.walletService.createNewUserWallet(owner_entity_id, trx);
+        log("creating user");
+        const hashedUserPassword = await this.authService.hashUserPassword(userDetails.password);
+        userUuid = await this.createUser({ ...userDetails, password: hashedUserPassword }, trx);
 
-        log(`Auth Request, account created for user with uuid: ${user_uuid}`);
+        const [ownerEntity] = await trx<Entity>("entity").where("uuid", userUuid);
+        await this.walletService.createNewUserWallet(ownerEntity.id, trx);
+
+        log(`Auth Request: account created for user with uuid: ${userUuid}`);
       });
+
+      return this.authService.createJWT({ userId: userUuid! });
     } catch (error: any) {
       log(error?.message, error?.stack);
 
       return false;
     }
-
-    return this.authService.createJWT({ userId: user_uuid });
   }
 
-  async getUserById(id: string) {
+  async getUserById(userUuid: string) {
     try {
-      const deepUserRecord = await this.fetchUserRecordDeep({ userUuid: id, trx: this.dbClient });
+      const deepUserRecord = await this.fetchUserRecordDeep({ userUuid: userUuid });
 
       return {
-        success: true,
-        userUuid: id,
+        _id: deepUserRecord.user.uuid,
         first_name: deepUserRecord.user.first_name,
         last_name: deepUserRecord.user.last_name,
         wallet: {
@@ -70,20 +68,24 @@ export class UsersService {
     } catch (error: any) {
       log(error?.message, error?.stack);
 
-      return { success: false };
+      return false;
     }
   }
 
-  async fetchUserRecordDeep(args: { userUuid: string; trx: Knex }): Promise<{ user: User; wallet: Wallet }> {
+  async fetchUserRecordDeep(args: { userUuid: string; trx?: Knex.Transaction }): Promise<deepUserRecord> {
     const { userUuid, trx } = args;
-    const [deepUserRecord] = (await trx
+    const localTrx = trx || (await this.dbClient.transaction());
+
+    const [deepUserRecord] = (await localTrx
       .from<User>("user")
       .innerJoin<Wallet>("wallet", "user.entity_id", "wallet.owner_entity_id")
       .options({
         nestTables: true,
       })
-      .where(`user.uuid = ${userUuid}`)
+      .where(`user.uuid`, "=", `${userUuid}`)
       .whereNull("wallet.disabled_date")) as { user: User; wallet: Wallet }[];
+
+    if (!trx) await localTrx.commit();
 
     if (!deepUserRecord) throw new Error("no wallet found");
 
@@ -91,7 +93,8 @@ export class UsersService {
   }
 
   async getUserByEmail(email: string) {
-    const [user] = await this.dbClient<User>("user").select().where({ email });
+    const [user] = await this.dbClient<User>("user").where({ email });
+    if (!user) return undefined;
 
     return { ...user, password: undefined };
   }
@@ -107,3 +110,8 @@ export class UsersService {
     return [];
   }
 }
+
+type deepUserRecord = {
+  user: User;
+  wallet: Wallet;
+};
