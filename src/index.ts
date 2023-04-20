@@ -7,7 +7,7 @@ import debug from "debug";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import { CommonRoutesConfig } from "./modules/common/common.routes.config";
-import { loadRoutes } from "./configs/loadroutes";
+import { loadRoutes } from "./configs/routes.factory";
 
 dotenv.config();
 
