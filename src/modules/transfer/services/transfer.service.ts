@@ -1,7 +1,6 @@
 import debug from "debug";
 import { v4 as uuidv4 } from "uuid";
 import { Knex } from "knex";
-import { Wallet } from "../../../db_models/wallet";
 import { Transfer } from "../../../db_models/transfer";
 import { UsersService } from "../../users/services/users.service";
 import { CreateTransferDto } from "../dto/create-transfer.dto";
@@ -16,15 +15,7 @@ export class TransferService {
     private readonly walletService: WalletService
   ) {}
 
-  async createTransfer(params: {
-    amount: number;
-    sourceWalletId: number;
-    destinationWalletId: number;
-    userEntityId: number;
-    extTrx?: Knex;
-  }) {
-    const { amount, sourceWalletId, destinationWalletId, userEntityId, extTrx } = params;
-    const trx = extTrx || (await this.dbClient.transaction());
+  async createTransfer({ amount, sourceWalletId, destinationWalletId, userEntityId, trx }: createTransferType) {
     const transferUuid = uuidv4();
 
     await trx<Transfer>("transfer").insert({
@@ -71,13 +62,29 @@ export class TransferService {
       await this.walletService.takeMoneyFromWallet(createTransferDto.amount, deepUserRecord.wallet.id, trx);
       await this.walletService.addMoneyToWallet(createTransferDto.amount, destinationWallet.id, trx);
       await this.updateTransferStatus(transegrUuid, "completed", trx);
+      await trx.commit();
 
-      trx.commit();
+      return {
+        _id: deepUserRecord.wallet.uuid,
+        status: "completed",
+        recipient: {
+          _id: destinationWallet.uuid,
+          amount: createTransferDto.amount,
+        },
+      };
     } catch (error: any) {
-      trx.rollback();
+      await trx.rollback();
 
       log(error?.message, error?.stack);
       throw error;
     }
   }
 }
+
+type createTransferType = {
+  amount: number;
+  sourceWalletId: number;
+  destinationWalletId: number;
+  userEntityId: number;
+  trx: Knex.Transaction;
+};

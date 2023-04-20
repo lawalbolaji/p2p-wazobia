@@ -1,6 +1,5 @@
 import debug from "debug";
 import { Knex } from "knex";
-import { BankAccount } from "../../../db_models/bankaccount";
 import { UsersService } from "../../users/services/users.service";
 import { CreatePayoutDto } from "../dto/create-payout.dto";
 import { v4 as uuidv4 } from "uuid";
@@ -20,10 +19,9 @@ export class PayoutService {
     private readonly paymentServiceProvider: DemoPaymentProcessor
   ) {}
 
-  async createPayout(params: { destination: string; amount: number; userEntityId: number; extTrx?: Knex }) {
-    const { amount, destination, userEntityId, extTrx } = params;
+  async createPayout(params: { destination: string; amount: number; userEntityId: number; trx: Knex.Transaction }) {
+    const { amount, destination, userEntityId, trx } = params;
     const payoutUuid = uuidv4();
-    const trx = extTrx || (await this.dbClient.transaction());
 
     await trx<Payout>("payout").insert({
       uuid: payoutUuid,
@@ -36,10 +34,8 @@ export class PayoutService {
     return payoutUuid;
   }
 
-  async updatePayoutStatus(payoutUuid: string, status: "pending" | "completed" | "returned", extTrx?: Knex) {
-    const trx = extTrx || (await this.dbClient.transaction());
-
-    await trx<Payout>("payout")
+  updatePayoutStatus(payoutUuid: string, status: "pending" | "completed" | "returned", trx: Knex.Transaction) {
+    return trx<Payout>("payout")
       .update({
         status,
       })
@@ -64,10 +60,18 @@ export class PayoutService {
       };
       const payoutUuid = await this.createPayout(createPayoutOptions);
       await this.walletService.takeMoneyFromWallet(createPayoutDto.amount, deepUserRecord.wallet.id, trx);
-      await this.paymentServiceProvider.payoutToBank(createPayoutDto.amount, "todo: get_user_token");
+      const payoutResponse = await this.paymentServiceProvider.payoutToBank(createPayoutDto.amount, "todo: get_user_token");
       await this.updatePayoutStatus(payoutUuid, "completed", trx);
-
       await trx.commit();
+
+      return {
+        _id: payoutUuid,
+        status: payoutResponse.status,
+        recipient: {
+          _id: payoutResponse.token,
+          amount: payoutResponse.amount,
+        },
+      };
     } catch (error: any) {
       await trx.rollback();
       log(error?.message, error?.stack);

@@ -13,9 +13,9 @@ export class WalletService {
     return wallet;
   }
 
-  async getWalletById(walletId: string, extTrx?: Knex){
+  async getWalletById(walletId: string, extTrx?: Knex) {
     const [wallet] = await this.dbClient<Wallet>("wallet").where("uuid", walletId);
-    
+
     return wallet;
   }
 
@@ -29,14 +29,14 @@ export class WalletService {
     });
   }
 
-  addMoneyToWallet(amount: number, walletId: number, trx: Knex) {
-    trx<Wallet>("wallet")
+  addMoneyToWallet(amount: number, walletId: number, trx: Knex.Transaction) {
+    return trx<Wallet>("wallet")
       .update({ balance: trx.raw(`balance + ${amount}`) })
       .where({ id: walletId });
   }
 
-  takeMoneyFromWallet(amount: number, walletId: number, trx: Knex) {
-    trx<Wallet>("wallet")
+  takeMoneyFromWallet(amount: number, walletId: number, trx: Knex.Transaction) {
+    return trx<Wallet>("wallet")
       .update({ balance: trx.raw(`balance - ${amount}`) })
       .where({ id: walletId });
   }
