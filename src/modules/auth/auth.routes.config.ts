@@ -22,14 +22,14 @@ export class AuthRoutes extends CommonRoutesConfig {
       .post([
         this.authMiddleware.validateAuthRequestBodyFields,
         this.authMiddleware.verifyUserPassword,
-        this.authController.createJWT,
+        this.authController.createJWT.bind(this.authController),
       ]);
 
-    this.app.post(`/auth/refresh-token`, [
+    this.app.post(`/auth/refresh`, [
       this.jwtMiddleware.validJWTNeeded,
       this.jwtMiddleware.verifyRefreshBodyField,
-      this.jwtMiddleware.validRefreshNeeded,
-      this.authController.createJWT,
+      this.jwtMiddleware.validRefreshNeeded.bind(this.jwtMiddleware),
+      this.authController.createJWT.bind(this.authController),
     ]);
 
     return this.app;

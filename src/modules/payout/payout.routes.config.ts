@@ -12,6 +12,8 @@ export class PayoutRoutes extends CommonRoutesConfig {
     private readonly payoutController: PayoutController
   ) {
     super(app, "Payout Routes");
+
+    this.configureRoutes();
   }
 
   configureRoutes(): express.Application {
@@ -19,14 +21,14 @@ export class PayoutRoutes extends CommonRoutesConfig {
       .route("/payouts")
       .all(this.jwtMiddlware.validJWTNeeded)
       .get([this.payoutMiddleware.validateRequiredFields, this.payoutController.listPayouts])
-      .post([this.payoutMiddleware.validateRequiredFields, this.payoutController.createPayout]);
+      .post([this.payoutMiddleware.validateRequiredFields, this.payoutController.createPayout.bind(this.payoutController)]);
 
     this.app
       .route("/payouts/:payoutId")
       .get([
         this.jwtMiddlware.validJWTNeeded,
         this.payoutMiddleware.validateRequiredFields,
-        this.payoutController.getPayoutById,
+        this.payoutController.getPayoutById.bind(this.payoutController),
       ]);
 
     return this.app;

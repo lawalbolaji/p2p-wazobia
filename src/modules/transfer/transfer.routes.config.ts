@@ -18,17 +18,17 @@ export class TransferRoutes extends CommonRoutesConfig {
 
   configureRoutes(): express.Application {
     this.app
-      .route("/payouts")
+      .route("/transfers")
       .all(this.jwtMiddleware.validJWTNeeded)
       .get([this.transferMiddleware.validateRequiredFields, this.transferController.listTransfers])
-      .post([this.transferMiddleware.validateRequiredFields, this.transferController.createTrasnfer]);
+      .post([this.transferMiddleware.validateRequiredFields, this.transferController.createTrasnfer.bind(this.transferController)]);
 
     this.app
-      .route("/payouts/:payoutId")
+      .route("/transfers/:transferId")
       .get([
         this.jwtMiddleware.validJWTNeeded,
         this.transferMiddleware.validateRequiredFields,
-        this.transferController.getTransferById,
+        this.transferController.getTransferById.bind(this.transferController),
       ]);
 
     return this.app;

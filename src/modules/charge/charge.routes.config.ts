@@ -21,14 +21,14 @@ export class ChargeRoutes extends CommonRoutesConfig {
       .route("/charges")
       .all(this.jwtMiddlware.validJWTNeeded)
       .get([this.chargeMiddleware.validateRequiredFields, this.chargeController.listCharges])
-      .post([this.chargeMiddleware.validateRequiredFields, this.chargeController.createCharge]);
+      .post([this.chargeMiddleware.validateRequiredFields, this.chargeController.createCharge.bind(this.chargeController)]);
 
     this.app
       .route("/charges/:chargeId")
       .get([
         this.jwtMiddlware.validJWTNeeded,
         this.chargeMiddleware.validateRequiredFields,
-        this.chargeController.getChargeById,
+        this.chargeController.getChargeById.bind(this.chargeController),
       ]);
 
     return this.app;

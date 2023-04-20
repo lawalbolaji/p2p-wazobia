@@ -18,10 +18,10 @@ export class CardRoutes extends CommonRoutesConfig {
 
   configureRoutes(): express.Application {
     this.app
-      .route("user/:userId/cards")
+      .route("/users/:userId/cards")
       .all(this.jwtMiddleware.validJWTNeeded)
-      .get([this.cardMiddleware.validateRequiredFields, this.cardController.listCardsByUserId])
-      .post([this.cardMiddleware.validateRequiredFields, this.cardController.createCard]);
+      .get([this.cardMiddleware.validateRequiredFields, this.cardController.listCardsByUserId.bind(this.cardController)])
+      .post([this.cardMiddleware.validateRequiredFields, this.cardController.createCard.bind(this.cardController)]);
 
     return this.app;
   }

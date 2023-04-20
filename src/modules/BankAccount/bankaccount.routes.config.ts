@@ -18,18 +18,13 @@ export class BankAccountRoutes extends CommonRoutesConfig {
 
   configureRoutes(): express.Application {
     this.app
-      .route("user/:userId/bankaccounts")
+      .route("/users/:userId/bankaccounts")
       .all(this.jwtMiddleware.validJWTNeeded)
-      .get([this.bankAccountMiddleware.validateRequiredFields, this.bankAccountController.listBankAccountsByUserId])
-      .post([this.bankAccountMiddleware.validateRequiredFields, this.bankAccountController.createBankAccount]);
-
-    this.app
-      .route("user/:userId/bankaccounts/:bankaccountId")
-      .get([
-        this.jwtMiddleware.validJWTNeeded,
+      .post([
         this.bankAccountMiddleware.validateRequiredFields,
-        this.bankAccountController.getBankAccountByUserId,
-      ]);
+        this.bankAccountController.createBankAccount.bind(this.bankAccountController),
+      ])
+      .get([this.jwtMiddleware.validJWTNeeded, this.bankAccountController.getBankAccountByUserId.bind(this.bankAccountController)]);
 
     return this.app;
   }
