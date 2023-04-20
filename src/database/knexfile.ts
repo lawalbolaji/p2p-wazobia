@@ -10,12 +10,16 @@ export const knexConfig: Knex.Config = {
     password: process.env.DATABASE_PASSWORD,
     host: process.env.DATABASE_HOST,
     port: +(process.env.DATABASE_PORT || 3306),
+    multipleStatements: process.env.NODE_ENV !== "production",
   },
   pool: {
     min: 2,
     max: 10,
   },
   migrations: {
-    tableName: "knex_migrations",
+    directory: "./migrations",
+  },
+  seeds: {
+    directory: "./seeds",
   },
 };

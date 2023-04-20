@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node --unhandled-rejections=strict ./dist/index.js",
-    "debug": "export DEBUG=* && npm run start",
+    "start:debug": "export DEBUG=* && npm run start",
     "start:dev": "nodemon",
     "build": "rimraf ./dist && tsc",
     "test": "jest",
     "lint": "eslint . --ext .ts",
-    "lint-and-fix": "eslint . --ext .ts --fix"
+    "lint-and-fix": "eslint . --ext .ts --fix",
+    "db:migrate": "npx knex --knexfile ./src/database/knexfile.ts migrate:latest",
+    "db:seed": "npx knex --knexfile ./src/database/knexfile.ts seed:run"
   },
   "keywords": [],
   "author": "",
