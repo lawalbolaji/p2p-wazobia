@@ -3,8 +3,10 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { Jwt } from "../../common/types/jwt";
 import { UsersService } from "../../users/services/users.service";
+import debug from "debug";
 
 const jwtSecret: string = process.env.JWT_SECRET!!;
+const log: debug.IDebugger = debug("app:jwt-middleware");
 
 export class JwtMiddleware {
   constructor(private readonly usersService: UsersService) {}
@@ -19,6 +21,7 @@ export class JwtMiddleware {
   async validRefreshNeeded(req: express.Request, res: express.Response, next: express.NextFunction) {
     const user: any = await this.usersService.getUserById(res.locals.jwt.userId);
     const salt = crypto.createSecretKey(Buffer.from(res.locals.jwt.refreshKey.data));
+
     const hash = crypto
       .createHmac("sha512", salt)
       .update(res.locals.jwt.userId + jwtSecret)
@@ -27,7 +30,6 @@ export class JwtMiddleware {
     if (hash === req.body.refreshToken) {
       req.body = {
         userId: user.uuid,
-        // email: user.email,
         // permissionFlags: user.permissionFlags,
       };
       return next();
@@ -44,9 +46,11 @@ export class JwtMiddleware {
           return res.status(401).send();
         } else {
           res.locals.jwt = jwt.verify(authorization[1], jwtSecret) as Jwt;
+          log("successful auth request: %0", res.locals.jwt.userId);
           next();
         }
       } catch (err) {
+        log("error: %0", err);
         return res.status(403).send();
       }
     } else {
