@@ -185,7 +185,7 @@ DROP TABLE IF EXISTS `transfer` ;
 
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `transfer` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `uuid` CHAR(36) NOT NULL,
   `source_wallet_id` INT NOT NULL,
   `destination_wallet_id` INT NOT NULL,
@@ -331,7 +331,7 @@ SHOW WARNINGS$$
 USE `p2p_wazobia_db`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`wallet_BEFORE_INSERT` BEFORE INSERT ON `wallet` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 2, new.uuid, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 2, new.uuid, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
     SET NEW.last_updated_at = current_timestamp();
@@ -425,7 +425,7 @@ SHOW WARNINGS$$
 USE `p2p_wazobia_db`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`bankaccount_BEFORE_INSERT` BEFORE INSERT ON `bankaccount` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 4, NEW.ext_token, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 4, NEW.ext_token, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
 END$$
