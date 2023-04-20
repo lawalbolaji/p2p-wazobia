@@ -30,7 +30,8 @@ export class BankAccountService {
     } catch (error: any) {
       await trx.rollback();
 
-      log(error?.message, error?.stack);
+      log("error: %0", error);
+      throw error;
     }
   }
 
