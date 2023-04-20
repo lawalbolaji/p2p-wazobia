@@ -6,7 +6,7 @@ export class TransferController {
 
   async createTrasnfer(req: express.Request, res: express.Response) {
     try {
-      const result = await this.transferService.executeTransfer(req.body, req.body.userId);
+      const result = await this.transferService.executeTransfer(req.body, res.locals.jwt.userId);
 
       return res.status(201).json(result);
     } catch (error) {

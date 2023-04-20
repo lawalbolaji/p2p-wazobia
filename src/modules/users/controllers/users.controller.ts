@@ -5,8 +5,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   getUserById = async (req: express.Request, res: express.Response) => {
-    const details = await this.usersService.getUserById(req.body.id);
-    if (!!details.success) return res.status(201).json(details);
+    const details = await this.usersService.getUserById(res.locals.jwt.userId);
+    if (!!details) return res.status(201).json(details);
 
     return res.status(400).json({ message: "request failed" });
   };
@@ -15,7 +15,7 @@ export class UsersController {
 
   async createUser(req: express.Request, res: express.Response) {
     const token = await this.usersService.registerNewUser(req.body);
-    if (!!token) return res.status(201).json({ token });
+    if (!!token) return res.status(201).json(token);
 
     return res.status(403).json({ message: "unable to create account" });
   }

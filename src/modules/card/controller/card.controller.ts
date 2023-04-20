@@ -6,7 +6,9 @@ export class CardController {
 
   async createCard(req: express.Request, res: express.Response) {
     try {
-      const result = await this.cardService.createCard(req.body, req.body.userId);
+      if (req.params.userId !== res.locals.jwt.userId) return res.status(401).json();
+
+      const result = await this.cardService.createCard(req.body, res.locals.jwt.userId);
 
       return res.status(201).json(result);
     } catch (error) {
