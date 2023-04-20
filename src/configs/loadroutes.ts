@@ -44,7 +44,7 @@ export const loadRoutes = (app: express.Application) => {
   const usersService = new UsersService(dbClient, walletService, authService);
   const usersMiddleware = new UsersMiddleware(usersService);
   const usersController = new UsersController(usersService);
-  const authController = new AuthController();
+  const authController = new AuthController(authService);
   const authMiddleware = new AuthMiddleware(usersService);
   const jwtMiddleware = new JwtMiddleware(usersService);
   const chargeMiddleware = new ChargeMiddleware();
