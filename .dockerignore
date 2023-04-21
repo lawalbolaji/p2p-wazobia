@@ -1,0 +1,20 @@
+# dev folders
+node_modules
+deploy
+dist
+
+# docs
+README.md
+notes.txt
+
+# dev configs
+nodemon.json
+Dockerfile
+docker-compose.yml
+.prettierrc.json
+.prettierignore
+.gitignore
+.eslintrc
+.env.example
+.env
+.env.docker
