@@ -8,12 +8,24 @@ services:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_USER: ${DATABASE_USER}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_ROOT_PASSWORD: 
+      MYSQL_ROOT_PASSWORD:
     volumes:
       - mysql_volume:/etc
     ports:
+      # this is just so I can troubleshoot the container from my machine
       - "3306:3306"
     expose:
       - 3306
+  p2p_wazobia_api:
+    build:
+      context: ./
+    ports:
+      - "3100": "3100"
+    expose:
+      - 3100
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
 volumes:
   mysql_volume:

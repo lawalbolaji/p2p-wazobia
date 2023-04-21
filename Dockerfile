@@ -1,13 +1,15 @@
-FROM node:14-slim
+FROM node:16-alpine
 
-RUN mkdir -p /usr/src/app
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci
 
-COPY . .
+COPY nodemon.json ./nodemon.json
+COPY tsconfig.json ./tsconfig.json
 
-RUN npm install
+# need to bind src in docker container to local volume @ ./src in docker run
+# can do this in docker run or in the docker-compose definition
+# -v $(pwd)/src:/app/src
 
-EXPOSE 3100
-
-CMD ["node", "./dist/index.js"]
+CMD ["npm", "run", "start:dev"]
