@@ -20,16 +20,18 @@ export class KnexService {
 
   createConnectionPool() {
     log("Attempting Database connection");
-
     this.dbClient = knex(this.config);
-    this.dbClient
-      .raw("SELECT VERSION()")
-      .then((version: any) => {
-        log(`Connection was succesful. Version: ${version[0][0]["VERSION()"]}`);
-      })
-      .catch((err: any) => {
-        log(`erorr connecting to database, ${err?.message}`);
-        throw err;
-      });
+
+    // this doesn't really serve any purpose since knexjs doesnt provide any error handling for failed database connections
+    // this.dbClient
+    //   .raw("SELECT VERSION()")
+    //   .then((version: any) => {
+    //     log(`Connection was succesful. Version: ${version[0][0]["VERSION()"]}`);
+    //   })
+    //   .catch((err: any) => {
+    //     log(`erorr connecting to database, ${err?.message}`);
+    //     throw err;
+    //   });
+    
   }
 }

@@ -12,19 +12,24 @@ export class AuthMiddleware {
   constructor(private readonly usersService: UsersService) {}
 
   verifyUserPassword = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const user: User = await this.usersService.getUserByEmailWithPassword(req.body.email);
+    try {
+      const user: User = await this.usersService.getUserByEmailWithPassword(req.body.email);
 
-    if (!!user) {
-      if (await bcrypt.compare(req.body.password, user.password)) {
-        req.body = {
-          userId: user.uuid,
-        };
+      if (!!user) {
+        if (await bcrypt.compare(req.body.password, user.password)) {
+          req.body = {
+            userId: user.uuid,
+          };
 
-        return next();
+          return next();
+        }
       }
-    }
 
-    res.status(400).send({ errors: ["Invalid email and/or password"] });
+      res.status(400).send({ errors: ["Invalid email and/or password"] });
+    } catch (error) {
+      log("error: %0", error);
+      res.status(500).send({ error: ["unable to process request"] });
+    }
   };
 
   validateAuthRequestBodyFields(req: express.Request, res: express.Response, next: express.NextFunction) {
