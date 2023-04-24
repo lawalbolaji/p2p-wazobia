@@ -1,7 +1,7 @@
 {
   "name": "wallet",
   "version": "1.0.0",
-  "description": "a REST based wallet service",
+  "description": "a REST-based wallet service",
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node --unhandled-rejections=strict ./dist/index.js",
@@ -12,6 +12,7 @@
     "test:debug": "export DEBUG=* && npm test",
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
+    "db:start": "docker run -d --name testdb --env-file .env.local.test -p 6603:3306 -v $(pwd)/.mysql/store/etc/mysql:/etc/mysql -v $(pwd)/.mysql/store/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d mysql/mysql-server:latest",
     "db:seed": "DOTENV_CONFIG_PATH=./.env.local.test npx --node-options='-r dotenv/config' knex --knexfile ./src/database/knexfile.ts seed:run"
   },
   "keywords": [],
