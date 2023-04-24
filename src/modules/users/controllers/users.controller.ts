@@ -6,7 +6,7 @@ export class UsersController {
 
   getUserById = async (req: express.Request, res: express.Response) => {
     const details = await this.usersService.getUserById(res.locals.jwt.userId);
-    if (!!details) return res.status(201).json(details);
+    if (!!details) return res.status(200).json(details);
 
     return res.status(400).json({ message: "request failed" });
   };
