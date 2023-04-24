@@ -1,20 +1,6 @@
--- TODO: replace with a migration file and use migrations and seeding instead
-
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
-
--- -----------------------------------------------------
--- Schema p2p_wazobia_db
--- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `p2p_wazobia_db` ;
-
--- -----------------------------------------------------
--- Schema p2p_wazobia_db
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `p2p_wazobia_db` DEFAULT CHARACTER SET utf8mb3 ;
-SHOW WARNINGS;
-USE `p2p_wazobia_db` ;
 
 -- -----------------------------------------------------
 -- Table `entitytype`
@@ -271,41 +257,41 @@ CREATE TABLE IF NOT EXISTS `bankaccount` (
     ON UPDATE RESTRICT);
 
 SHOW WARNINGS;
-USE `p2p_wazobia_db`;
+USE `p2p_wazobia_db_test`;
 
 DELIMITER $$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `entity_BEFORE_UPDATE` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`entity_BEFORE_UPDATE` BEFORE UPDATE ON `entity` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`entity_BEFORE_UPDATE` BEFORE UPDATE ON `entity` FOR EACH ROW
 BEGIN
  SET NEW.last_updated_at = current_timestamp();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `card_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`card_BEFORE_INSERT` BEFORE INSERT ON `card` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`card_BEFORE_INSERT` BEFORE INSERT ON `card` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 3, NEW.ext_token, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db_test`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 3, NEW.ext_token, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `user_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`user_BEFORE_INSERT` BEFORE INSERT ON `user` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`user_BEFORE_INSERT` BEFORE INSERT ON `user` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 1, new.uuid, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db_test`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 1, new.uuid, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
     SET NEW.created_at = current_timestamp();
@@ -314,24 +300,24 @@ END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `user_BEFORE_UPDATE` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`user_BEFORE_UPDATE` BEFORE UPDATE ON `user` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`user_BEFORE_UPDATE` BEFORE UPDATE ON `user` FOR EACH ROW
 BEGIN
     SET NEW.last_updated_at = current_timestamp();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `wallet_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`wallet_BEFORE_INSERT` BEFORE INSERT ON `wallet` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`wallet_BEFORE_INSERT` BEFORE INSERT ON `wallet` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 2, new.uuid, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db_test`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 2, new.uuid, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
     SET NEW.last_updated_at = current_timestamp();
@@ -339,22 +325,22 @@ END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `wallet_BEFORE_UPDATE` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`wallet_BEFORE_UPDATE` BEFORE UPDATE ON `wallet` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`wallet_BEFORE_UPDATE` BEFORE UPDATE ON `wallet` FOR EACH ROW
 BEGIN	
     SET NEW.last_updated_at = current_timestamp();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `charge_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`charge_BEFORE_INSERT` BEFORE INSERT ON `charge` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`charge_BEFORE_INSERT` BEFORE INSERT ON `charge` FOR EACH ROW
 BEGIN
     SET NEW.created_at = current_timestamp();
     SET NEW.last_updated_at = current_timestamp();
@@ -362,22 +348,22 @@ END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `charge_BEFORE_UPDATE` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`charge_BEFORE_UPDATE` BEFORE UPDATE ON `charge` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`charge_BEFORE_UPDATE` BEFORE UPDATE ON `charge` FOR EACH ROW
 BEGIN
     SET NEW.last_updated_at = current_timestamp();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `transfer_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`transfer_BEFORE_INSERT` BEFORE INSERT ON `transfer` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`transfer_BEFORE_INSERT` BEFORE INSERT ON `transfer` FOR EACH ROW
 BEGIN
     SET NEW.created_at = current_timestamp();
     SET NEW.last_updated_at = current_timestamp();
@@ -385,22 +371,22 @@ END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `transfer_BEFORE_UPDATE` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`transfer_BEFORE_UPDATE` BEFORE UPDATE ON `transfer` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`transfer_BEFORE_UPDATE` BEFORE UPDATE ON `transfer` FOR EACH ROW
 BEGIN
     SET NEW.last_updated_at = current_timestamp();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `payout_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`payout_BEFORE_INSERT` BEFORE INSERT ON `payout` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`payout_BEFORE_INSERT` BEFORE INSERT ON `payout` FOR EACH ROW
 BEGIN
     SET NEW.created_at = current_timestamp();
     SET NEW.last_updated_at = current_timestamp();
@@ -408,24 +394,24 @@ END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `payout_BEFORE_UPDATE` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`payout_BEFORE_UPDATE` BEFORE UPDATE ON `payout` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`payout_BEFORE_UPDATE` BEFORE UPDATE ON `payout` FOR EACH ROW
 BEGIN
     SET NEW.last_updated_at = current_timestamp();
 END$$
 
 SHOW WARNINGS$$
 
-USE `p2p_wazobia_db`$$
+USE `p2p_wazobia_db_test`$$
 DROP TRIGGER IF EXISTS `bankaccount_BEFORE_INSERT` $$
 SHOW WARNINGS$$
-USE `p2p_wazobia_db`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db`.`bankaccount_BEFORE_INSERT` BEFORE INSERT ON `bankaccount` FOR EACH ROW
+USE `p2p_wazobia_db_test`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `p2p_wazobia_db_test`.`bankaccount_BEFORE_INSERT` BEFORE INSERT ON `bankaccount` FOR EACH ROW
 BEGIN
-	INSERT INTO `p2p_wazobia_db`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 4, NEW.ext_token, current_timestamp(), current_timestamp());
+	INSERT INTO `p2p_wazobia_db_test`.`entity` (`id`, `entity_type_id`, `uuid`, `created_at`, `last_updated_at`) VALUES (DEFAULT, 4, NEW.ext_token, current_timestamp(), current_timestamp());
         
 	SET NEW.entity_id =  LAST_INSERT_ID();
 END$$

@@ -1,13 +1,16 @@
 import { Knex } from "knex";
+import { EntityType } from "../models/entitytype";
 
 export async function seed(knex: Knex): Promise<void> {
-    // Deletes ALL existing entries
-    await knex("table_name").del();
+  const entityTypes = await knex<EntityType>("entitytype").where({});
+  if (entityTypes.length > 0) return;
 
-    // Inserts seed entries
-    await knex("table_name").insert([
-        { id: 1, colName: "rowValue1" },
-        { id: 2, colName: "rowValue2" },
-        { id: 3, colName: "rowValue3" }
+  return knex<EntityType>("entitytype").then(function () {
+    return knex<EntityType>("entitytype").insert([
+      { id: 1, description: "user" },
+      { id: 2, description: "wallet" },
+      { id: 3, description: "card" },
+      { id: 4, description: "bankaccount" },
     ]);
-};
+  });
+}
