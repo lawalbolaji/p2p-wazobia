@@ -11,10 +11,7 @@ notes.txt
 nodemon.json
 Dockerfile
 docker-compose.yml
-.prettierrc.json
-.prettierignore
+.prettier*
 .gitignore
 .eslintrc
-.env.example
-.env
-.env.docker
+.env*
