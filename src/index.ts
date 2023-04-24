@@ -4,12 +4,11 @@ import * as winston from "winston";
 import * as expressWinston from "express-winston";
 import cors from "cors";
 import debug from "debug";
-import dotenv from "dotenv";
 import helmet from "helmet";
 import { CommonRoutesConfig } from "./modules/common/common.routes.config";
-import { loadRoutes } from "./configs/routes.factory";
-
-dotenv.config();
+import { loadRoutes } from "./factory/routes.factory";
+import { KnexService } from "./modules/common/services/knex.service";
+import * as knexConfig from "../src/database/knexfile";
 
 const app: express.Application = express();
 const v1App: express.Application = express();
@@ -34,8 +33,14 @@ const loggerOptions: expressWinston.LoggerOptions = {
       all: true,
     })
   ),
-  meta: !!process.env.DEBUG,
 };
+
+if (!process.env.DEBUG) {
+  loggerOptions.meta = false;
+  if (typeof global.it === "function") {
+    loggerOptions.level = "http";
+  }
+}
 
 app.use(expressWinston.logger(loggerOptions));
 
@@ -45,10 +50,13 @@ app.get("/", (req: express.Request, res: express.Response) => {
   res.status(200).send(runningMessage);
 });
 
+// setup database conn
+const dbClient = new KnexService(knexConfig).getKnex();
+
 app.use("/api/v1", v1App);
 
-server.listen(port, () => {
-  loadRoutes(v1App).forEach((route: CommonRoutesConfig) => {
+export default server.listen(port, () => {
+  loadRoutes(v1App, dbClient).forEach((route: CommonRoutesConfig) => {
     debugLog(`Routes configured for ${route.getName()}`);
   });
 

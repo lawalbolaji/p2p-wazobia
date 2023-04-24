@@ -1,8 +1,6 @@
-import type { Knex } from "knex";
-import dotenv from "dotenv";
+import { Knex } from "knex";
 
-dotenv.config();
-export const knexConfig: Knex.Config = {
+module.exports = {
   client: "mysql2",
   connection: {
     database: process.env.DATABASE_NAME,
@@ -22,4 +20,4 @@ export const knexConfig: Knex.Config = {
   seeds: {
     directory: "./seeds",
   },
-};
+} as Knex.Config;

@@ -1,4 +1,3 @@
-import { knexConfig } from "../database/knexfile";
 import { AuthRoutes } from "../modules/auth/auth.routes.config";
 import { AuthController } from "../modules/auth/controllers/auth.controller";
 import { AuthMiddleware } from "../modules/auth/middleware/auth.middleware";
@@ -17,7 +16,6 @@ import { ChargeController } from "../modules/charge/controller/charge.controller
 import { ChargeMiddleware } from "../modules/charge/middleware/charge.middlware";
 import { ChargeService } from "../modules/charge/services/charge.service";
 import { CommonRoutesConfig } from "../modules/common/common.routes.config";
-import { KnexService } from "../modules/common/services/knex.service";
 import { DemoPaymentProcessor } from "../modules/payment/services/demo.payment.service";
 import { PayoutController } from "../modules/payout/controller/payout.controller";
 import { PayoutMiddleware } from "../modules/payout/middleware/payout.middleware";
@@ -33,11 +31,11 @@ import { UsersService } from "../modules/users/services/users.service";
 import { UserRoutes } from "../modules/users/user.routes.config";
 import { WalletService } from "../modules/wallet/services/wallet.service";
 import express from "express";
+import { Knex } from "knex";
 
-export const loadRoutes = (app: express.Application) => {
+export const loadRoutes = (app: express.Application, dbClient: Knex<any, any[]>) => {
   const routes: Array<CommonRoutesConfig> = [];
 
-  const dbClient = new KnexService(knexConfig).getKnex();
   const paymentServiceProvider = new DemoPaymentProcessor();
   const walletService = new WalletService(dbClient);
   const bankAccountService = new BankAccountService(dbClient, paymentServiceProvider);
