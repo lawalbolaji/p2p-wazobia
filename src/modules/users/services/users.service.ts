@@ -1,5 +1,4 @@
 import debug from "debug";
-import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import { Knex } from "knex";
 import { User } from "../../../database/models/user";
@@ -9,7 +8,6 @@ import { WalletService } from "../../wallet/services/wallet.service";
 import { AuthService } from "../../auth/services/auth.service";
 import { Entity } from "../../../database/models/entity";
 
-dotenv.config();
 const log: debug.IDebugger = debug("app:users-service");
 
 export class UsersService {
@@ -46,6 +44,7 @@ export class UsersService {
       return this.authService.createJWT({ userId: userUuid! });
     } catch (error: any) {
       log(error?.message, error?.stack);
+      console.log(error)
 
       return false;
     }

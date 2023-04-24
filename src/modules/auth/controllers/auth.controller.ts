@@ -1,9 +1,7 @@
 import express from "express";
 import debug from "debug";
-import dotenv from "dotenv";
 import { AuthService } from "../services/auth.service";
 
-dotenv.config();
 const log: debug.IDebugger = debug("app:auth-controller");
 
 export class AuthController {
