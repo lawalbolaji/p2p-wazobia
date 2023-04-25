@@ -43,10 +43,10 @@ P2P-Wazobia is a scalable REST-based wallet service that enables users to deposi
 > npm run start:dev
 ```
 
-Don't forget to checkout our [documentation](/)!
+Don't forget to checkout out the [documentation](/)!
 
 ## Deployment
-Please refer to our deployment instructions [here](/).
+Please refer to deployment instructions [here](/).
 
 ## Contributing
 - Missing something or found a bug? [Report here](/).
